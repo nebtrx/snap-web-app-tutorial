@@ -1,25 +1,17 @@
-machine:
-  environment:
-    PATH: $HOME/.cabal/bin:$CIRCLE_ARTIFACTS:$PATH
-
 dependencies:
-  pre:
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 20
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 20
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 10
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
-    - mkdir -p .stack-work
-    - bash ./install-stack.sh
-
   cache_directories:
-    - "~/.cabal"
-    - "~/.stack"
-    - ".stack-work"
+    - "~/.stack/"
+    - ".stack-work/"
 
   override:
     - stack setup
-    - stack build --install-ghc --test --only-dependencies -j1
+    - stack build --only-dependencies
+
+  pre:
+    - mkdir -p .stack-work/
+    - bash ./scripts/install-stack.sh
 
 test:
   override:
-    - stack build
+    - stack build:
+        timeout: 300
