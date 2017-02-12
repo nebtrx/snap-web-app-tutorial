@@ -2,7 +2,7 @@ module Todo.Utilities
   ( showAsText
   , byteStringToText
   , fromBSTo
-  )where
+  ) where
 
 import           Data.ByteString    (ByteString)
 import           Data.Maybe         (fromMaybe)

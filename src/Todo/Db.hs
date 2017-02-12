@@ -4,30 +4,21 @@
 
 module Todo.Db
     ( startConnection
-    , checkMigrationOrMigrate
+    , runMigrations
     , saveTodo
     , allTodos
     , getTodo
     , deleteTodo
     , updateTodoCompleted
-    , Todo(..)
-    )where
+    ) where
 
 import           Control.Monad           (unless)
 import           Data.Either             (rights)
 import           Data.Maybe              (fromMaybe, listToMaybe)
 import           Data.String.Interpolate
-import           Data.Text               (Text)
 import           Database.HDBC
 import           Database.HDBC.Sqlite3
-
-
--- | Todo data type definition
-data Todo = Todo
-  { todoID      :: Maybe Int
-  , description :: Text
-  , completed   :: Bool
-  } deriving (Eq, Show, Read)
+import           Todo.Types              (Todo (..))
 
 
 -- | Starts Connection
@@ -49,7 +40,7 @@ tableExists conn tblName = do
   where
     rowToValue :: [SqlValue] -> String
     rowToValue (snippetBody:_) = fromSql snippetBody
-    rowToValue _ = error "Unable to read single value"
+    rowToValue _               = error "Unable to read single value"
 
 
 -- | Created the Todo table
@@ -67,9 +58,9 @@ createTodoTable conn = do
 
 -- | Check required table are present.
 -- If not, then performs the required operations to achieve it
-checkMigrationOrMigrate :: Connection
-                        -> IO ()
-checkMigrationOrMigrate conn = do
+runMigrations :: Connection
+              -> IO ()
+runMigrations conn = do
   -- Note: for a real app, you probably want to create a 'version'
   -- table too and use it to keep track of schema version and
   -- implement your schema upgrade procedure here.
@@ -140,7 +131,7 @@ getTodo conn todoId = do
   return todo
 
 
--- | Removes a specific Todo data value/row from the database
+-- | Removes a specific Todo row from the database
 deleteTodo  :: Connection
             -> Int
             -> IO ()
